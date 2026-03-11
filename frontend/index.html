@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mini ChatGPT</title>
+
+<style>
+
+body{
+font-family: Arial;
+background:#343541;
+margin:0;
+display:flex;
+flex-direction:column;
+height:100vh;
+}
+
+#header{
+background:#202123;
+color:white;
+padding:15px;
+font-size:20px;
+}
+
+#chat{
+flex:1;
+overflow-y:auto;
+padding:20px;
+}
+
+.message{
+max-width:60%;
+padding:12px;
+margin:10px;
+border-radius:8px;
+white-space:pre-wrap;
+}
+
+.user{
+background:#0b93f6;
+color:white;
+margin-left:auto;
+}
+
+.bot{
+background:#444654;
+color:white;
+}
+
+#inputArea{
+display:flex;
+padding:15px;
+background:#40414f;
+}
+
+#input{
+flex:1;
+padding:12px;
+font-size:16px;
+border:none;
+border-radius:5px;
+}
+
+button{
+margin-left:10px;
+padding:12px 20px;
+background:#19c37d;
+border:none;
+color:white;
+border-radius:5px;
+cursor:pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="header">Mini ChatGPT</div>
+
+<div id="chat"></div>
+
+<div id="inputArea">
+<input id="input" placeholder="Send a message..." />
+<button onclick="sendMessage()">Send</button>
+</div>
+
+<script>
+
+async function sendMessage(){
+
+const input = document.getElementById("input")
+const text = input.value
+
+if(text === "") return
+
+addMessage(text,"user")
+input.value=""
+
+const chat = document.getElementById("chat")
+
+const botMsg = document.createElement("div")
+botMsg.className="message bot"
+chat.appendChild(botMsg)
+
+const response = await fetch("http://localhost:8000/chat",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({message:text})
+})
+
+const reader = response.body.getReader()
+const decoder = new TextDecoder()
+
+while(true){
+
+const {done,value} = await reader.read()
+
+if(done) break
+
+botMsg.textContent += decoder.decode(value)
+
+chat.scrollTop = chat.scrollHeight
+
+}
+
+}
+
+function addMessage(text,type){
+
+const chat = document.getElementById("chat")
+
+const msg = document.createElement("div")
+msg.className="message "+type
+msg.textContent=text
+
+chat.appendChild(msg)
+
+chat.scrollTop = chat.scrollHeight
+
+}
+
+</script>
+
+</body>
+</html>
