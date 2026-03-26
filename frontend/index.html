@@ -102,7 +102,7 @@ const botMsg = document.createElement("div")
 botMsg.className="message bot"
 chat.appendChild(botMsg)
 
-const response = await fetch("http://localhost:8000/chat",{
+const response = await fetch("http://127.0.0.1:8000/chat",{
 method:"POST",
 headers:{
 "Content-Type":"application/json"
@@ -110,22 +110,14 @@ headers:{
 body:JSON.stringify({message:text})
 })
 
-const reader = response.body.getReader()
-const decoder = new TextDecoder()
+const data = await response.json()
 
-while(true){
-
-const {done,value} = await reader.read()
-
-if(done) break
-
-botMsg.textContent += decoder.decode(value)
+botMsg.textContent = data.response
 
 chat.scrollTop = chat.scrollHeight
 
 }
 
-}
 
 function addMessage(text,type){
 

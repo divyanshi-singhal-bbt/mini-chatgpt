@@ -1,20 +1,29 @@
-async function send(){
+async function send() {
 
-const msg = document.getElementById("message").value;
+    const msgBox = document.getElementById("message");
+    const chatBox = document.getElementById("chat");
 
-const res = await fetch("http://localhost:8000/chat",{
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({message:msg})
-});
+    const msg = msgBox.value;
 
-const data = await res.json();
+    if (!msg) return;
 
-const chat = document.getElementById("chat");
+    chatBox.innerHTML += `<div><b>You:</b> ${msg}</div>`;
 
-chat.innerHTML += "<p><b>You:</b> "+msg+"</p>";
-chat.innerHTML += "<p><b>Bot:</b> "+data.reply+"</p>";
+    msgBox.value = "";
 
+    const res = await fetch("http://127.0.0.1:8000/chat", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            message: msg
+        })
+    });
+
+    const data = await res.json();
+
+    console.log("DATA:", data);
+
+    chatBox.innerHTML += `<div><b>Bot:</b> ${data.response}</div>`;
 }
